@@ -30,7 +30,6 @@ class CateringGUI:
         self.menu_val = IntVar()
         self.menu_val.set(1)
 
-
         # parent
         cater_lbl = Label(parent, text="Rhon's Catering")
         cater_lbl.grid(row = 0, column = 0)
@@ -71,7 +70,16 @@ class CateringGUI:
 
     def switch_frames(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
-        print("Frames switched!")
+        if self.menu_val.get() == 1:
+            print("Switched to frame one!")
+
+        elif self.menu_val.get() == 2:
+            print("Switched to frame two!")
+
+        else:
+            print("Switched to frame three!")
+        
+
 
 
 if __name__ == "__main__":
