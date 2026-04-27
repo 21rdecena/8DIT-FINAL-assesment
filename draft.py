@@ -26,6 +26,8 @@ class CateringGUI:
                              CaterPackage("Wedding Dinner", "Grilled Sirloin Steak, Mashed Potatoes, Sparkling Water ", 40),
                              CaterPackage("Children's Birthday", "Pepperoni Pizza, French Fries, Fresh Orange Juice ", 30)]
 
+        self.cater_packages_val = StringVar()
+        self.cater_packages_val.set(catering_packages[0].name)
 
         self.menu_val = IntVar()
         self.menu_val.set(1)
@@ -42,7 +44,6 @@ class CateringGUI:
 
         check_orders_rb = Radiobutton(parent, text = "Check Orders", variable = self.menu_val, value = 3, command = self.switch_frames)
         check_orders_rb.grid(row = 0, column = 3)
-
 
         # home frame
         self.home_frame = Frame(parent)
@@ -64,24 +65,55 @@ class CateringGUI:
         # ordering frame
         self.place_order_frame = Frame(parent)
 
-        test_lbl = Label(self.place_order_frame, text = "Testing Label!")
-        test_lbl.grid(row = 2, column = 0)
+        name_lbl = Label(self.place_order_frame, text = "Name:")
+        name_lbl.grid(row = 2, column = 0)
 
+        number_ppl_lbl = Label(self.place_order_frame, text = "How many people?")
+        number_ppl_lbl.grid(row = 2, column = 2)
+
+        self.name_entry = Entry(self.place_order_frame)
+        self.name_entry.grid(row = 3, column = 0)
+
+        self.number_ppl_entry = Entry(self.place_order_frame)
+        self.number_ppl_entry.grid(row = 3, column = 2)
+
+        package_lbl = Label(self.place_order_frame, text = "Cater Package:")
+        package_lbl.grid(row = 4, column = 0)
+
+        pax_lbl = Label(self.place_order_frame, text = "How many people?")
+        pax_lbl.grid(row = 4, column = 2)
+
+        package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in catering_packages]) # list comprehension
+        package_opt_menu.grid(row = 5, column = 0)
+
+        pax_cost_lbl = Label(self.place_order_frame, text = "$3.00")
+        pax_cost_lbl.grid(row = 5, column = 2)
+
+        # check orders frame
+        self.check_order_frame = Frame(parent)
+
+        test_lbl = Label(self.check_order_frame, text = "Hello World!")
+        test_lbl.grid(row = 2, column = 0)
 
     def switch_frames(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
         if self.menu_val.get() == 1:
             #print("Switched to frame one!")
             self.place_order_frame.grid_forget()
+            self.check_order_frame.grid_forget()
             self.home_frame.grid(row = 1, column = 0, columnspan = 4)
 
         elif self.menu_val.get() == 2:
             #print("Switched to frame two!")
             self.home_frame.grid_forget()
+            self.check_order_frame.grid_forget()
             self.place_order_frame.grid(row = 1, column = 0, columnspan = 4)
 
         else:
-            print("Switched to frame three!")
+            self.home_frame.grid_forget()
+            self.place_order_frame.grid_forget()
+            self.check_order_frame.grid(row = 1, column = 0, columnspan = 4)
+            #print("Switched to frame three!")
         
 
 
