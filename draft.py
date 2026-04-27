@@ -71,10 +71,14 @@ class CateringGUI:
     def switch_frames(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
         if self.menu_val.get() == 1:
-            print("Switched to frame one!")
+            #print("Switched to frame one!")
+            self.place_order_frame.grid_forget()
+            self.home_frame.grid(row = 1, column = 0, columnspan = 4)
 
         elif self.menu_val.get() == 2:
-            print("Switched to frame two!")
+            #print("Switched to frame two!")
+            self.home_frame.grid_forget()
+            self.place_order_frame.grid(row = 1, column = 0, columnspan = 4)
 
         else:
             print("Switched to frame three!")
