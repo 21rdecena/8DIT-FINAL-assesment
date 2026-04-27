@@ -25,51 +25,53 @@ class CateringGUI:
         catering_packages = [CaterPackage("Corporate Lunch", "Garlic Pesto Pasta, Garlic Bread, Iced Lemon Tea ", 20),
                              CaterPackage("Wedding Dinner", "Grilled Sirloin Steak, Mashed Potatoes, Sparkling Water ", 40),
                              CaterPackage("Children's Birthday", "Pepperoni Pizza, French Fries, Fresh Orange Juice ", 30)]
-        menu_selections = ['home', 'place']
-        self.menu_val = StringVar()
-        self.menu_val.set(menu_selections[0])
+
+
+        self.menu_val = IntVar()
+        self.menu_val.set(1)
+
 
         # parent
         cater_lbl = Label(parent, text="Rhon's Catering")
-        cater_lbl.grid()
+        cater_lbl.grid(row = 0, column = 0)
 
-        menu_option = OptionMenu(parent, self.menu_val, *menu_selections, command = self.switch_frames())
-        menu_option.grid()
+        home_rb = Radiobutton(parent, text = "Home", variable = self.menu_val, value = 1, command = self.switch_frames)
+        home_rb.grid(row = 0, column = 1)
+
+        place_order_rb = Radiobutton(parent, text = "Place Order", variable = self.menu_val, value = 2, command = self.switch_frames)
+        place_order_rb.grid(row = 0, column = 2)
+
+        check_orders_rb = Radiobutton(parent, text = "Check Orders", variable = self.menu_val, value = 3, command = self.switch_frames)
+        check_orders_rb.grid(row = 0, column = 3)
+
 
         # home frame
         self.home_frame = Frame(parent)
-        self.home_frame.grid()
+        self.home_frame.grid(row = 1, column = 0, columnspan = 4)
 
         title_lbl = Label(self.home_frame, text = "Welcome to Rhon's Catering!")
-        title_lbl.grid()
+        title_lbl.grid(row = 2, column = 0, columnspan = 2)
 
         subtitle_lbl = Label(self.home_frame, text = "Short subtitle text introducing the GUI to the User")
-        subtitle_lbl.grid()
+        subtitle_lbl.grid(row = 3, column = 0, columnspan = 2)
 
         package_lbl = Label(self.home_frame, text = "Catering Packages")
-        package_lbl.grid()
+        package_lbl.grid(row = 4, column = 0)
 
         for package in catering_packages:
-            cater_packages_lbl = Label(self.home_frame, text = f'{package.display_packages()}')
-            cater_packages_lbl.grid()
+            cater_packages_lbl = Label(self.home_frame, text = f'{package.display_packages()}')       # it would be better to change this so each instance variable
+            cater_packages_lbl.grid(sticky = W)                                                       # within the object has seperate labels, allowing for padding on each
         
         # ordering frame
         self.place_order_frame = Frame(parent)
 
         test_lbl = Label(self.place_order_frame, text = "Testing Label!")
-        test_lbl.grid()
+        test_lbl.grid(row = 2, column = 0)
 
 
     def switch_frames(self):
-        """ Placeholder docstring describing the method (REPLACE THIS!!!!!) """
-        if self.menu_val.get() == "place":
-            self.home_frame.grid_forget()
-            self.place_order_frame.grid()
-
-        else:
-            self.place_order_frame.grid_forget()
-            self.home_frame.grid()
-
+        """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
+        print("Frames switched!")
 
 
 if __name__ == "__main__":
