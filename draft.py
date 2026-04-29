@@ -1,6 +1,7 @@
 """" Placeholder docstring introducing the program (REPLACE THIS!!!!!) """
 
 from tkinter import *
+from tkinter import messagebox
 
 class CaterPackage:
     def __init__ (self, name, menu, pax_cost):
@@ -22,15 +23,19 @@ class CateringGUI:
     def __init__ (self, parent):
         """ ask mr harding if __init__ needs a docstring"""
         # values
-        catering_packages = [CaterPackage("Corporate Lunch", "Garlic Pesto Pasta, Garlic Bread, Iced Lemon Tea ", 20),
+        user_orders = []
+
+        self.catering_packages = [CaterPackage("Corporate Lunch", "Garlic Pesto Pasta, Garlic Bread, Iced Lemon Tea ", 20),
                              CaterPackage("Wedding Dinner", "Grilled Sirloin Steak, Mashed Potatoes, Sparkling Water ", 40),
-                             CaterPackage("Children's Birthday", "Pepperoni Pizza, French Fries, Fresh Orange Juice ", 30)]
+                             CaterPackage("Children's Birthday", "Pepperoni Pizza, French Fries, Fresh Orange Juice ", 30)]  # get length of list and add it to padding
 
         self.cater_packages_val = StringVar()
-        self.cater_packages_val.set(catering_packages[0].name)
+        self.cater_packages_val.set(self.catering_packages[0].name)
 
         self.menu_val = IntVar()
         self.menu_val.set(1)
+
+        self.package_index = 0
 
         # parent
         cater_lbl = Label(parent, text="Rhon's Catering")
@@ -58,7 +63,7 @@ class CateringGUI:
         package_lbl = Label(self.home_frame, text = "Catering Packages")
         package_lbl.grid(row = 4, column = 0)
 
-        for package in catering_packages:
+        for package in self.catering_packages:
             cater_packages_lbl = Label(self.home_frame, text = f'{package.display_packages()}')       # it would be better to change this so each instance variable
             cater_packages_lbl.grid(sticky = W)                                                       # within the object has seperate labels, allowing for padding on each
         
@@ -83,10 +88,10 @@ class CateringGUI:
         pax_lbl = Label(self.place_order_frame, text = "Pax Cost:")
         pax_lbl.grid(row = 4, column = 2)
 
-        package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in catering_packages], command = self.update_pax) # list comprehension
+        package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = self.update_pax) # list comprehension
         package_opt_menu.grid(row = 5, column = 0)
 
-        self.pax_cost_lbl = Label(self.place_order_frame, text = f"${catering_packages[0].pax_cost:.2f}") # need to update this 
+        self.pax_cost_lbl = Label(self.place_order_frame, text = f"${self.catering_packages[self.package_index].pax_cost:.2f}") # probably want to polish this in the future
         self.pax_cost_lbl.grid(row = 5, column = 2)
 
         '''
@@ -94,14 +99,13 @@ class CateringGUI:
         additional feature
         '''
 
-
         self.final_cost_lbl = Label(self.place_order_frame, text = "Order not yet calculated.")
         self.final_cost_lbl.grid(row = 6, column = 0, columnspan = 3)
 
-        self.calculate_btn = Button(self.place_order_frame, text = "Calculate Cost") # make an error pop-up for every invalid input
+        self.calculate_btn = Button(self.place_order_frame, text = "Calculate Cost", command = self.calculate_cost) # make an error pop-up for every invalid input
         self.calculate_btn.grid(row = 7, column = 0, columnspan=2)
 
-        self.submit_btn = Button(self.place_order_frame, text = "Submit Order", state = DISABLED) # create a pop-up that asks the user if they want to submit their order
+        self.submit_btn = Button(self.place_order_frame, text = "Submit Order", state = DISABLED, command = self.submit_order) # create a pop-up that asks the user if they want to submit their order
         self.submit_btn.grid(row = 7, column = 2, columnspan=2)
 
         # check orders frame
@@ -158,12 +162,25 @@ class CateringGUI:
 
         else:
             self.home_frame.grid_forget()
-            self.place_order_frame.grid_forget()
+            self.place_order_frame.grid_forget()                                        # update check order labels with user
             self.check_order_frame.grid(row = 1, column = 0, columnspan = 4)
             #print("Switched to frame three!")
         
+    
+    def calculate_cost(self):
+        print("Calculated cost!")
+        self.submit_btn.configure(state = NORMAL)
+
+    def submit_order(self):
+        print("Submitted order!")
+        self.submit_btn.configure(state = DISABLED)
+        # clear entries and reset option menu when finished
+
     def update_pax(self, choice):
-        print("Updated labels!")
+        for package in self.catering_packages:
+            if choice == package.name:
+                self.pax_cost_lbl.configure(text = f'${package.pax_cost:.2f}')
+        #print("Updated labels!")
 
 
 if __name__ == "__main__":
