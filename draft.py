@@ -89,13 +89,19 @@ class CateringGUI:
         self.pax_cost_lbl = Label(self.place_order_frame, text = f"${catering_packages[0].pax_cost:.2f}") # need to update this 
         self.pax_cost_lbl.grid(row = 5, column = 2)
 
+        '''
+        maybe create some widgets that allows the user to input a date
+        additional feature
+        '''
+
+
         self.final_cost_lbl = Label(self.place_order_frame, text = "Order not yet calculated.")
         self.final_cost_lbl.grid(row = 6, column = 0, columnspan = 3)
 
-        self.calculate_btn = Button(self.place_order_frame, text = "Calculate Cost")
+        self.calculate_btn = Button(self.place_order_frame, text = "Calculate Cost") # make an error pop-up for every invalid input
         self.calculate_btn.grid(row = 7, column = 0, columnspan=2)
 
-        self.submit_btn = Button(self.place_order_frame, text = "Submit Order", state = DISABLED)
+        self.submit_btn = Button(self.place_order_frame, text = "Submit Order", state = DISABLED) # create a pop-up that asks the user if they want to submit their order
         self.submit_btn.grid(row = 7, column = 2, columnspan=2)
 
         # check orders frame
@@ -103,6 +109,38 @@ class CateringGUI:
 
         user_orders_lbl = Label(self.check_order_frame, text = "Order/s that you have made:")
         user_orders_lbl.grid(row = 2, column = 0)
+
+        name_lbl = Label(self.check_order_frame, text = "First Name:")
+        name_lbl.grid(row = 3, column = 0)
+        
+        number_ppl_lbl = Label(self.check_order_frame, text = "Number of People:")
+        number_ppl_lbl.grid(row = 3, column = 2)
+
+        self.user_name_lbl = Label(self.check_order_frame, text = "Lorem ipsum")
+        self.user_name_lbl.grid(row = 4, column = 0)
+        
+        self.user_ppl_lbl = Label(self.check_order_frame, text = "Lorem ipsum")
+        self.user_ppl_lbl.grid(row = 4, column = 2)
+
+        package_lbl = Label(self.check_order_frame, text = "Cater Package:")
+        package_lbl.grid(row = 5, column = 0)
+
+        pax_lbl = Label(self.check_order_frame, text = "Pax Cost:")
+        pax_lbl.grid(row = 5, column = 2)
+
+        self.user_package_lbl = Label(self.check_order_frame, text = "Lorem ipsum")
+        self.user_package_lbl.grid(row = 6, column = 0)
+        
+        self.user_pax_lbl = Label(self.check_order_frame, text = "Lorem ipsum")
+        self.user_pax_lbl.grid(row = 6, column = 2)
+
+        self.prev_btn = Button(self.check_order_frame, text = "Previous")
+        self.prev_btn.grid(row = 7, column = 0)
+
+        self.next_btn = Button(self.check_order_frame, text = "Next")
+        self.next_btn.grid(row = 7, column = 2)
+
+
 
     def switch_frames(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
