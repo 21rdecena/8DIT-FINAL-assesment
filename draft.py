@@ -65,7 +65,7 @@ class CateringGUI:
         # ordering frame
         self.place_order_frame = Frame(parent)
 
-        name_lbl = Label(self.place_order_frame, text = "Name:")
+        name_lbl = Label(self.place_order_frame, text = "First Name:")
         name_lbl.grid(row = 2, column = 0)
 
         number_ppl_lbl = Label(self.place_order_frame, text = "How many people?")
@@ -80,20 +80,29 @@ class CateringGUI:
         package_lbl = Label(self.place_order_frame, text = "Cater Package:")
         package_lbl.grid(row = 4, column = 0)
 
-        pax_lbl = Label(self.place_order_frame, text = "How many people?")
+        pax_lbl = Label(self.place_order_frame, text = "Pax Cost:")
         pax_lbl.grid(row = 4, column = 2)
 
-        package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in catering_packages]) # list comprehension
+        package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in catering_packages], command = self.update_pax) # list comprehension
         package_opt_menu.grid(row = 5, column = 0)
 
-        pax_cost_lbl = Label(self.place_order_frame, text = "$3.00")
-        pax_cost_lbl.grid(row = 5, column = 2)
+        self.pax_cost_lbl = Label(self.place_order_frame, text = f"${catering_packages[0].pax_cost:.2f}") # need to update this 
+        self.pax_cost_lbl.grid(row = 5, column = 2)
+
+        self.final_cost_lbl = Label(self.place_order_frame, text = "Order not yet calculated.")
+        self.final_cost_lbl.grid(row = 6, column = 0, columnspan = 3)
+
+        self.calculate_btn = Button(self.place_order_frame, text = "Calculate Cost")
+        self.calculate_btn.grid(row = 7, column = 0, columnspan=2)
+
+        self.submit_btn = Button(self.place_order_frame, text = "Submit Order", state = DISABLED)
+        self.submit_btn.grid(row = 7, column = 2, columnspan=2)
 
         # check orders frame
         self.check_order_frame = Frame(parent)
 
-        test_lbl = Label(self.check_order_frame, text = "Hello World!")
-        test_lbl.grid(row = 2, column = 0)
+        user_orders_lbl = Label(self.check_order_frame, text = "Order/s that you have made:")
+        user_orders_lbl.grid(row = 2, column = 0)
 
     def switch_frames(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
@@ -115,7 +124,8 @@ class CateringGUI:
             self.check_order_frame.grid(row = 1, column = 0, columnspan = 4)
             #print("Switched to frame three!")
         
-
+    def update_pax(self, choice):
+        print("Updated labels!")
 
 
 if __name__ == "__main__":
