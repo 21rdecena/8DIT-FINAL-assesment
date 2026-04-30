@@ -71,7 +71,7 @@ class CateringGUI:
             cater_packages_lbl.grid(sticky = W)                                                       # within the object has seperate labels, allowing for padding on each
         
         # ordering frame
-        self.final_cost = 0
+        self.calculated_cost = 0
 
         self.place_order_frame = Frame(parent)
 
@@ -104,14 +104,14 @@ class CateringGUI:
         additional feature
         '''
 
-        self.final_cost_output = Label(self.place_order_frame, text = "Order not yet calculated.")
-        self.final_cost_output.grid(row = 6, column = 0, columnspan = 3)
+        #self.final_cost_output = Label(self.place_order_frame, text = "Order not yet calculated.")
+        #self.final_cost_output.grid(row = 6, column = 0, columnspan = 3)
 
-        self.calculate_btn = Button(self.place_order_frame, text = "Calculate Cost", command = self.calculate_cost) # make an error pop-up for every invalid input
-        self.calculate_btn.grid(row = 7, column = 0, columnspan=2)
+        self.calculate_btn = Button(self.place_order_frame, text = "Calculate Order Cost", command = self.calculate_cost) # make an error pop-up for every invalid input
+        self.calculate_btn.grid(row = 7, column = 0, columnspan=4)
 
-        self.submit_btn = Button(self.place_order_frame, text = "Submit Order", state = DISABLED, command = self.submit_order) # create a pop-up that asks the user if they want to submit their order
-        self.submit_btn.grid(row = 7, column = 2, columnspan=2)
+        #self.submit_btn = Button(self.place_order_frame, text = "Submit Order", state = DISABLED, command = self.submit_order) # create a pop-up that asks the user if they want to submit their order
+        #self.submit_btn.grid(row = 7, column = 2, columnspan=2)
 
         # check orders frame
         self.check_order_frame = Frame(parent)
@@ -173,22 +173,35 @@ class CateringGUI:
         
     
     def calculate_cost(self):
+        user_name = self.get_name_entry()
+
         try:
             pax = int(self.number_ppl_entry.get())
             if pax >= 1:
-                self.final_cost_output.configure(text = f"Your final cost for this order is ${self.catering_packages[self.package_index].calculate_cost(pax):.2f}")
+                self.calculated_cost = self.catering_packages[self.package_index].calculate_cost(pax)
+                self.final_cost_output.configure(text = f"Your final cost for this order is ${self.calculated_cost:.2f}")
+                self.submit_btn.configure(state = NORMAL)
+
+            # add input validation later
         except ValueError:
             pass
+        
 
-
-        self.submit_btn.configure(state = NORMAL)
-
-    def submit_order(self):
+    def get_name_entry(self):
+        if self.name_entry.get().strip() == "":
+            messagebox.showerror("Invalid name input", "Please enter a valid name!")
+            self.name_entry.delete(0, END)
+            self.number_ppl_entry.delete(0, END)
+            self.name_entry.focus()
+            
+    '''def submit_order(self):
         user_name = self.name_entry.get()
-        print("Submitted order!")
+        user_num_ppl = int(self.number_ppl_entry.get())
+        user_order_cost = self.calculated_cost
+
         self.submit_btn.configure(state = DISABLED)
         # clear entries and reset option menu when finished
-
+'''
     def update_pax(self, choice):
         for package in self.catering_packages:
             if choice == package.name:
