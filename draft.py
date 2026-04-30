@@ -9,6 +9,9 @@ class CaterPackage:
         self.menu = menu
         self.pax_cost = pax_cost            # round up the costs to dollars
     
+    def calculate_cost(self, pax):
+        return pax * self.pax_cost
+
     def display_packages(self):
         return f'{self.name}     {self.menu}     ${self.pax_cost:.2f}'
 
@@ -68,6 +71,8 @@ class CateringGUI:
             cater_packages_lbl.grid(sticky = W)                                                       # within the object has seperate labels, allowing for padding on each
         
         # ordering frame
+        self.final_cost = 0
+
         self.place_order_frame = Frame(parent)
 
         name_lbl = Label(self.place_order_frame, text = "First Name:")
@@ -88,8 +93,8 @@ class CateringGUI:
         pax_lbl = Label(self.place_order_frame, text = "Pax Cost:")
         pax_lbl.grid(row = 4, column = 2)
 
-        package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = self.update_pax) # list comprehension
-        package_opt_menu.grid(row = 5, column = 0)
+        self.package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = self.update_pax) # list comprehension
+        self.package_opt_menu.grid(row = 5, column = 0)
 
         self.pax_cost_lbl = Label(self.place_order_frame, text = f"${self.catering_packages[self.package_index].pax_cost:.2f}") # probably want to polish this in the future
         self.pax_cost_lbl.grid(row = 5, column = 2)
@@ -99,8 +104,8 @@ class CateringGUI:
         additional feature
         '''
 
-        self.final_cost_lbl = Label(self.place_order_frame, text = "Order not yet calculated.")
-        self.final_cost_lbl.grid(row = 6, column = 0, columnspan = 3)
+        self.final_cost_output = Label(self.place_order_frame, text = "Order not yet calculated.")
+        self.final_cost_output.grid(row = 6, column = 0, columnspan = 3)
 
         self.calculate_btn = Button(self.place_order_frame, text = "Calculate Cost", command = self.calculate_cost) # make an error pop-up for every invalid input
         self.calculate_btn.grid(row = 7, column = 0, columnspan=2)
@@ -168,10 +173,18 @@ class CateringGUI:
         
     
     def calculate_cost(self):
-        print("Calculated cost!")
+        try:
+            pax = int(self.number_ppl_entry.get())
+            if pax >= 1:
+                self.final_cost_output.configure(text = f"Your final cost for this order is ${self.catering_packages[self.package_index].calculate_cost(pax):.2f}")
+        except ValueError:
+            pass
+
+
         self.submit_btn.configure(state = NORMAL)
 
     def submit_order(self):
+        user_name = self.name_entry.get()
         print("Submitted order!")
         self.submit_btn.configure(state = DISABLED)
         # clear entries and reset option menu when finished
@@ -180,7 +193,12 @@ class CateringGUI:
         for package in self.catering_packages:
             if choice == package.name:
                 self.pax_cost_lbl.configure(text = f'${package.pax_cost:.2f}')
-        #print("Updated labels!")
+                self.final_cost_output.configure(text = "Order not yet calculated.")
+                self.name_entry.delete(0, END)
+                self.number_ppl_entry.delete(0, END)
+                self.name_entry.focus()
+                self.submit_btn.configure(state = DISABLED)
+
 
 
 if __name__ == "__main__":
