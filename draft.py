@@ -26,19 +26,21 @@ class CateringGUI:
     def __init__ (self, parent):
         """ ask mr harding if __init__ needs a docstring"""
         # values
-        user_orders = []
-
+        self.user_orders = []
         self.catering_packages = [CaterPackage("Corporate Lunch", "Garlic Pesto Pasta, Garlic Bread, Iced Lemon Tea ", 20),
                              CaterPackage("Wedding Dinner", "Grilled Sirloin Steak, Mashed Potatoes, Sparkling Water ", 40),
                              CaterPackage("Children's Birthday", "Pepperoni Pizza, French Fries, Fresh Orange Juice ", 30)]  # get length of list and add it to padding
+        
+        self.package_index = 0
+        self.current_package = self.catering_packages[self.package_index]
 
         self.cater_packages_val = StringVar()
-        self.cater_packages_val.set(self.catering_packages[0].name)
+        self.cater_packages_val.set(self.current_package.name)
 
         self.menu_val = IntVar()
         self.menu_val.set(1)
 
-        self.package_index = 0
+        
 
         # parent
         cater_lbl = Label(parent, text="Rhon's Catering")
@@ -96,7 +98,7 @@ class CateringGUI:
         self.package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = self.update_pax) # list comprehension
         self.package_opt_menu.grid(row = 5, column = 0)
 
-        self.pax_cost_lbl = Label(self.place_order_frame, text = f"${self.catering_packages[self.package_index].pax_cost:.2f}") # probably want to polish this in the future
+        self.pax_cost_lbl = Label(self.place_order_frame, text = f"${self.current_package.pax_cost:.2f}") 
         self.pax_cost_lbl.grid(row = 5, column = 2)
 
         '''
@@ -163,6 +165,7 @@ class CateringGUI:
             #print("Switched to frame two!")
             self.home_frame.grid_forget()
             self.check_order_frame.grid_forget()
+            self.clear_entries()
             self.place_order_frame.grid(row = 1, column = 0, columnspan = 4)
 
         else:
@@ -173,46 +176,52 @@ class CateringGUI:
         
     
     def calculate_cost(self):
+        """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
         user_name = self.get_name_entry()
+        user_package = self.current_package.name
 
         try:
-            pax = int(self.number_ppl_entry.get())
-            if pax >= 1:
-                self.calculated_cost = self.catering_packages[self.package_index].calculate_cost(pax)
-                self.final_cost_output.configure(text = f"Your final cost for this order is ${self.calculated_cost:.2f}")
-                self.submit_btn.configure(state = NORMAL)
+            user_pax = int(self.number_ppl_entry.get())
+            if user_pax >= 1:
+                self.user_order_cost = self.catering_packages[self.package_index].calculate_cost(user_pax)
+                submit = messagebox.askyesno("Submit order?", f"Your final cost for this order is ${self.user_order_cost:.2f}\nDo you want to submit this order?")
+                if submit:
+                    self.user_orders.append(Order(user_name, user_pax, user_package, self.user_order_cost))
+                else:
+                    clear = messagebox.askyesno("Clear entries?", "Do you want to clear your entries?")
+                    if clear:
+                        self.clear_entries()
+                    else:
+                        self.name_entry.focus()
+
 
             # add input validation later
         except ValueError:
-            pass
+            messagebox.showerror("Invalid input", "Please enter a valid integer!")
+            self.clear_entries()
         
 
     def get_name_entry(self):
-        if self.name_entry.get().strip() == "":
+        """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
+        name = self.name_entry.get().strip()
+        if name == "":
             messagebox.showerror("Invalid name input", "Please enter a valid name!")
-            self.name_entry.delete(0, END)
-            self.number_ppl_entry.delete(0, END)
-            self.name_entry.focus()
-            
-    '''def submit_order(self):
-        user_name = self.name_entry.get()
-        user_num_ppl = int(self.number_ppl_entry.get())
-        user_order_cost = self.calculated_cost
+            self.clear_entries()
+        else:
+            return name
 
-        self.submit_btn.configure(state = DISABLED)
-        # clear entries and reset option menu when finished
-'''
     def update_pax(self, choice):
+        """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
         for package in self.catering_packages:
             if choice == package.name:
                 self.pax_cost_lbl.configure(text = f'${package.pax_cost:.2f}')
-                self.final_cost_output.configure(text = "Order not yet calculated.")
-                self.name_entry.delete(0, END)
-                self.number_ppl_entry.delete(0, END)
-                self.name_entry.focus()
-                self.submit_btn.configure(state = DISABLED)
+                self.clear_entries()
 
-
+    def clear_entries(self):
+        """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
+        self.name_entry.delete(0, END)
+        self.number_ppl_entry.delete(0, END)
+        self.name_entry.focus()
 
 if __name__ == "__main__":
     root = Tk()
