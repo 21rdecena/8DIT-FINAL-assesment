@@ -27,20 +27,20 @@ class CateringGUI:
         """ ask mr harding if __init__ needs a docstring"""
         # values
         self.user_orders = []
+        self.order_index = 0
+
         self.catering_packages = [CaterPackage("Corporate Lunch", "Garlic Pesto Pasta, Garlic Bread, Iced Lemon Tea ", 20),
                              CaterPackage("Wedding Dinner", "Grilled Sirloin Steak, Mashed Potatoes, Sparkling Water ", 40),
                              CaterPackage("Children's Birthday", "Pepperoni Pizza, French Fries, Fresh Orange Juice ", 30)]  # get length of list and add it to padding
-        
         self.package_index = 0
-        self.current_package = self.catering_packages[self.package_index]
+        self.selected_package = self.catering_packages[self.package_index]
+        
 
         self.cater_packages_val = StringVar()
-        self.cater_packages_val.set(self.current_package.name)
+        self.cater_packages_val.set(self.selected_package.name)
 
         self.menu_val = IntVar()
         self.menu_val.set(1)
-
-        
 
         # parent
         cater_lbl = Label(parent, text="Rhon's Catering")
@@ -98,7 +98,7 @@ class CateringGUI:
         self.package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = self.update_pax) # list comprehension
         self.package_opt_menu.grid(row = 5, column = 0)
 
-        self.pax_cost_lbl = Label(self.place_order_frame, text = f"${self.current_package.pax_cost:.2f}") 
+        self.pax_cost_lbl = Label(self.place_order_frame, text = f"${self.selected_package.pax_cost:.2f}") 
         self.pax_cost_lbl.grid(row = 5, column = 2)
 
         '''
@@ -106,14 +106,9 @@ class CateringGUI:
         additional feature
         '''
 
-        #self.final_cost_output = Label(self.place_order_frame, text = "Order not yet calculated.")
-        #self.final_cost_output.grid(row = 6, column = 0, columnspan = 3)
-
         self.calculate_btn = Button(self.place_order_frame, text = "Calculate Order Cost", command = self.calculate_cost) # make an error pop-up for every invalid input
         self.calculate_btn.grid(row = 7, column = 0, columnspan=4)
 
-        #self.submit_btn = Button(self.place_order_frame, text = "Submit Order", state = DISABLED, command = self.submit_order) # create a pop-up that asks the user if they want to submit their order
-        #self.submit_btn.grid(row = 7, column = 2, columnspan=2)
 
         # check orders frame
         self.check_order_frame = Frame(parent)
@@ -127,28 +122,28 @@ class CateringGUI:
         number_ppl_lbl = Label(self.check_order_frame, text = "Number of People:")
         number_ppl_lbl.grid(row = 3, column = 2)
 
-        self.user_name_lbl = Label(self.check_order_frame, text = "Lorem ipsum")
+        self.user_name_lbl = Label(self.check_order_frame, text = "No data entered yet")
         self.user_name_lbl.grid(row = 4, column = 0)
         
-        self.user_ppl_lbl = Label(self.check_order_frame, text = "Lorem ipsum")
+        self.user_ppl_lbl = Label(self.check_order_frame, text = "No data entered yet")
         self.user_ppl_lbl.grid(row = 4, column = 2)
 
         package_lbl = Label(self.check_order_frame, text = "Cater Package:")
         package_lbl.grid(row = 5, column = 0)
 
-        pax_lbl = Label(self.check_order_frame, text = "Pax Cost:")
+        pax_lbl = Label(self.check_order_frame, text = "Order Cost:")
         pax_lbl.grid(row = 5, column = 2)
 
-        self.user_package_lbl = Label(self.check_order_frame, text = "Lorem ipsum")
+        self.user_package_lbl = Label(self.check_order_frame, text = "No data entered yet")
         self.user_package_lbl.grid(row = 6, column = 0)
         
-        self.user_pax_lbl = Label(self.check_order_frame, text = "Lorem ipsum")
-        self.user_pax_lbl.grid(row = 6, column = 2)
+        self.user_cost_lbl = Label(self.check_order_frame, text = "No data entered yet")
+        self.user_cost_lbl.grid(row = 6, column = 2)
 
-        self.prev_btn = Button(self.check_order_frame, text = "Previous")
+        self.prev_btn = Button(self.check_order_frame, text = "Previous", command = lambda: self.switch_orders(-1))
         self.prev_btn.grid(row = 7, column = 0)
 
-        self.next_btn = Button(self.check_order_frame, text = "Next")
+        self.next_btn = Button(self.check_order_frame, text = "Next", command = lambda: self.switch_orders(-1))
         self.next_btn.grid(row = 7, column = 2)
 
 
@@ -156,13 +151,11 @@ class CateringGUI:
     def switch_frames(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
         if self.menu_val.get() == 1:
-            #print("Switched to frame one!")
             self.place_order_frame.grid_forget()
             self.check_order_frame.grid_forget()
             self.home_frame.grid(row = 1, column = 0, columnspan = 4)
 
         elif self.menu_val.get() == 2:
-            #print("Switched to frame two!")
             self.home_frame.grid_forget()
             self.check_order_frame.grid_forget()
             self.clear_entries()
@@ -171,14 +164,14 @@ class CateringGUI:
         else:
             self.home_frame.grid_forget()
             self.place_order_frame.grid_forget()                                        # update check order labels with user
+            self.check_orders()            
             self.check_order_frame.grid(row = 1, column = 0, columnspan = 4)
-            #print("Switched to frame three!")
         
     
     def calculate_cost(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
         user_name = self.get_name_entry()
-        user_package = self.current_package.name
+        user_package = self.selected_package.name
 
         try:
             user_pax = int(self.number_ppl_entry.get())
@@ -194,8 +187,6 @@ class CateringGUI:
                     else:
                         self.name_entry.focus()
 
-
-            # add input validation later
         except ValueError:
             messagebox.showerror("Invalid input", "Please enter a valid integer!")
             self.clear_entries()
@@ -206,7 +197,7 @@ class CateringGUI:
         name = self.name_entry.get().strip()
         if name == "":
             messagebox.showerror("Invalid name input", "Please enter a valid name!")
-            self.clear_entries()
+            self.clear_entries()                                                        # maybe check for the length of the name and 
         else:
             return name
 
@@ -216,6 +207,40 @@ class CateringGUI:
             if choice == package.name:
                 self.pax_cost_lbl.configure(text = f'${package.pax_cost:.2f}')
                 self.clear_entries()
+
+    def check_orders(self):
+        if len(self.user_orders) != 0: 
+            self.update_orders()
+            self.check_order_index()
+    
+        else:    
+            self.prev_btn.configure(state = DISABLED)
+            self.next_btn.configure(state = DISABLED)
+    
+    def check_order_index(self):
+        if self.order_index == 0 and len(self.user_orders) == 1:
+            self.prev_btn.configure(state = DISABLED)
+            self.next_btn.configure(state = DISABLED)
+        
+        elif self.order_index == 0:
+            self.prev_btn.configure(state = DISABLED)
+            self.next_btn.configure(state = NORMAL)
+        
+        else:
+            self.prev_btn.configure(state = NORMAL)
+            self.next_btn.configure(state = NORMAL)
+            
+
+    def update_orders(self):
+        self.selected_order = self.user_orders[self.order_index]
+
+        self.user_name_lbl.configure(text = f"{self.selected_order.name}")
+        self.user_ppl_lbl.configure(text = f"{self.selected_order.num_of_ppl} pax")
+        self.user_package_lbl.configure(text = f"{self.selected_order.cater_package}")
+        self.user_cost_lbl.configure(text = f"${self.selected_order.cost:.2f}")
+
+    def switch_orders(self):
+        self.check_order_index()
 
     def clear_entries(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
