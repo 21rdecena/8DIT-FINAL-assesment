@@ -68,10 +68,16 @@ class CateringGUI:
         package_lbl = Label(self.home_frame, text = "Catering Packages")
         package_lbl.grid(row = 4, column = 0)
 
+        row_count = 4
         for package in self.catering_packages:
-            cater_packages_lbl = Label(self.home_frame, text = f'{package.display_packages()}')       # it would be better to change this so each instance variable
-            cater_packages_lbl.grid(sticky = W)                                                       # within the object has seperate labels, allowing for padding on each
-        
+            row_count += 1
+            package_name_lbl = Label(self.home_frame, text = f'{package.name}')       # it would be better to change this so each instance variable
+            package_menu_lbl = Label(self.home_frame, text = f'{package.menu}')
+            package_cost_lbl = Label(self.home_frame, text = f'${package.pax_cost:.2f}')
+            package_name_lbl.grid(row = row_count, column = 0)                                                   # within the object has seperate labels, allowing for padding on each
+            package_menu_lbl.grid(row = row_count, column = 1)
+            package_cost_lbl.grid(row = row_count, column = 2)
+
         # ordering frame
         self.calculated_cost = 0
 
@@ -143,7 +149,7 @@ class CateringGUI:
         self.prev_btn = Button(self.check_order_frame, text = "Previous", command = lambda: self.switch_orders(-1))
         self.prev_btn.grid(row = 7, column = 0)
 
-        self.next_btn = Button(self.check_order_frame, text = "Next", command = lambda: self.switch_orders(-1))
+        self.next_btn = Button(self.check_order_frame, text = "Next", command = lambda: self.switch_orders(1))
         self.next_btn.grid(row = 7, column = 2)
 
 
@@ -186,7 +192,10 @@ class CateringGUI:
                         self.clear_entries()
                     else:
                         self.name_entry.focus()
-
+            else:
+                messagebox.showerror("Negative number found", "Please enter a valid integer!")
+                self.clear_entries()
+                pass
         except ValueError:
             messagebox.showerror("Invalid input", "Please enter a valid integer!")
             self.clear_entries()
@@ -218,6 +227,8 @@ class CateringGUI:
             self.next_btn.configure(state = DISABLED)
     
     def check_order_index(self):
+        max_index = len(self.user_orders) - 1
+
         if self.order_index == 0 and len(self.user_orders) == 1:
             self.prev_btn.configure(state = DISABLED)
             self.next_btn.configure(state = DISABLED)
@@ -225,6 +236,10 @@ class CateringGUI:
         elif self.order_index == 0:
             self.prev_btn.configure(state = DISABLED)
             self.next_btn.configure(state = NORMAL)
+
+        elif self.order_index == max_index:
+            self.prev_btn.configure(state = NORMAL)
+            self.next_btn.configure(state = DISABLED)
         
         else:
             self.prev_btn.configure(state = NORMAL)
@@ -239,8 +254,11 @@ class CateringGUI:
         self.user_package_lbl.configure(text = f"{self.selected_order.cater_package}")
         self.user_cost_lbl.configure(text = f"${self.selected_order.cost:.2f}")
 
-    def switch_orders(self):
+    def switch_orders(self, amount):
+        self.order_index += amount
         self.check_order_index()
+        self.update_orders()
+    
 
     def clear_entries(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
