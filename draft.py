@@ -12,8 +12,6 @@ class CaterPackage:
     def calculate_cost(self, pax):
         return pax * self.pax_cost
 
-    def display_packages(self):
-        return f'{self.name}     {self.menu}     ${self.pax_cost:.2f}'
 
 class Order:
     def __init__ (self, name, num_of_ppl, cater_package, cost):
@@ -26,6 +24,10 @@ class CateringGUI:
     def __init__ (self, parent):
         """ ask mr harding if __init__ needs a docstring"""
         # values
+        self.menu_options = ["Home", "Place Order", "View Order"]
+        self.menu_options_val = StringVar()
+        self.menu_options_val.set(self.menu_options[0])
+        
         self.user_orders = []
         self.order_index = 0
 
@@ -33,7 +35,7 @@ class CateringGUI:
                              CaterPackage("Wedding Dinner", "Grilled Sirloin Steak, Mashed Potatoes, Sparkling Water ", 40),
                              CaterPackage("Children's Birthday", "Pepperoni Pizza, French Fries, Fresh Orange Juice ", 30)]  # get length of list and add it to padding
         self.package_index = 0
-        self.selected_package = self.catering_packages[self.package_index]
+        self.selected_package = self.catering_packages[self.package_index]      # acts as a cursor through the list
         
 
         self.cater_packages_val = StringVar()
@@ -46,6 +48,9 @@ class CateringGUI:
         cater_lbl = Label(parent, text="Rhon's Catering")
         cater_lbl.grid(row = 0, column = 0)
 
+        navigation_menu = OptionMenu(parent, self.menu_options_val, *self.menu_options, command = self.switch_frames)
+        navigation_menu.grid(row = 0, column = 3)
+        '''
         home_rb = Radiobutton(parent, text = "Home", variable = self.menu_val, value = 1, command = self.switch_frames)
         home_rb.grid(row = 0, column = 1)
 
@@ -54,7 +59,7 @@ class CateringGUI:
 
         check_orders_rb = Radiobutton(parent, text = "Check Orders", variable = self.menu_val, value = 3, command = self.switch_frames)
         check_orders_rb.grid(row = 0, column = 3)
-
+        '''
         # home frame
         self.home_frame = Frame(parent)
         self.home_frame.grid(row = 1, column = 0, columnspan = 4)
@@ -68,13 +73,13 @@ class CateringGUI:
         package_lbl = Label(self.home_frame, text = "Catering Packages")
         package_lbl.grid(row = 4, column = 0)
 
-        row_count = 4
-        for package in self.catering_packages:
+        row_count = 4                                       # put this inside a function
+        for package in self.catering_packages:              
             row_count += 1
-            package_name_lbl = Label(self.home_frame, text = f'{package.name}')       # it would be better to change this so each instance variable
+            package_name_lbl = Label(self.home_frame, text = f'{package.name}')      
             package_menu_lbl = Label(self.home_frame, text = f'{package.menu}')
             package_cost_lbl = Label(self.home_frame, text = f'${package.pax_cost:.2f}')
-            package_name_lbl.grid(row = row_count, column = 0)                                                   # within the object has seperate labels, allowing for padding on each
+            package_name_lbl.grid(row = row_count, column = 0)                                                   
             package_menu_lbl.grid(row = row_count, column = 1)
             package_cost_lbl.grid(row = row_count, column = 2)
 
@@ -154,14 +159,14 @@ class CateringGUI:
 
 
 
-    def switch_frames(self):
+    def switch_frames(self, selected_option):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
-        if self.menu_val.get() == 1:
+        if selected_option == "Home":
             self.place_order_frame.grid_forget()
             self.check_order_frame.grid_forget()
             self.home_frame.grid(row = 1, column = 0, columnspan = 4)
 
-        elif self.menu_val.get() == 2:
+        elif selected_option == "Place Order":
             self.home_frame.grid_forget()
             self.check_order_frame.grid_forget()
             self.clear_entries()
@@ -195,7 +200,6 @@ class CateringGUI:
             else:
                 messagebox.showerror("Negative number found", "Please enter a valid integer!")
                 self.clear_entries()
-                pass
         except ValueError:
             messagebox.showerror("Invalid input", "Please enter a valid integer!")
             self.clear_entries()
