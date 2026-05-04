@@ -33,13 +33,13 @@ class CateringGUI:
 
         self.catering_packages = [CaterPackage("Corporate Lunch", "Garlic Pesto Pasta, Garlic Bread, Iced Lemon Tea ", 20),
                              CaterPackage("Wedding Dinner", "Grilled Sirloin Steak, Mashed Potatoes, Sparkling Water ", 40),
-                             CaterPackage("Children's Birthday", "Pepperoni Pizza, French Fries, Fresh Orange Juice ", 30)]  # get length of list and add it to padding
+                             CaterPackage("Children's Birthday", "Pepperoni Pizza, French Fries, Fresh Orange Juice ", 30)]  # get length of list and add it to padding 
         self.package_index = 0
         self.selected_package = self.catering_packages[self.package_index]      # acts as a cursor through the list
         
 
         self.cater_packages_val = StringVar()
-        self.cater_packages_val.set(self.selected_package.name)
+        self.cater_packages_val.set(self.catering_packages[0].name)
 
         self.menu_val = IntVar()
         self.menu_val.set(1)
@@ -48,18 +48,11 @@ class CateringGUI:
         cater_lbl = Label(parent, text="Rhon's Catering")
         cater_lbl.grid(row = 0, column = 0)
 
-        navigation_menu = OptionMenu(parent, self.menu_options_val, *self.menu_options, command = self.switch_frames)
-        navigation_menu.grid(row = 0, column = 3)
-        '''
-        home_rb = Radiobutton(parent, text = "Home", variable = self.menu_val, value = 1, command = self.switch_frames)
-        home_rb.grid(row = 0, column = 1)
+        self.editing_order_lbl = Label(parent, text = "Editing Order...")
 
-        place_order_rb = Radiobutton(parent, text = "Place Order", variable = self.menu_val, value = 2, command = self.switch_frames)
-        place_order_rb.grid(row = 0, column = 2)
+        self.navigation_menu = OptionMenu(parent, self.menu_options_val, *self.menu_options, command = self.switch_frames)
+        self.navigation_menu.grid(row = 0, column = 3)
 
-        check_orders_rb = Radiobutton(parent, text = "Check Orders", variable = self.menu_val, value = 3, command = self.switch_frames)
-        check_orders_rb.grid(row = 0, column = 3)
-        '''
         # home frame
         self.home_frame = Frame(parent)
         self.home_frame.grid(row = 1, column = 0, columnspan = 4)
@@ -73,15 +66,7 @@ class CateringGUI:
         package_lbl = Label(self.home_frame, text = "Catering Packages")
         package_lbl.grid(row = 4, column = 0)
 
-        row_count = 4                                       # put this inside a function
-        for package in self.catering_packages:              
-            row_count += 1
-            package_name_lbl = Label(self.home_frame, text = f'{package.name}')      
-            package_menu_lbl = Label(self.home_frame, text = f'{package.menu}')
-            package_cost_lbl = Label(self.home_frame, text = f'${package.pax_cost:.2f}')
-            package_name_lbl.grid(row = row_count, column = 0)                                                   
-            package_menu_lbl.grid(row = row_count, column = 1)
-            package_cost_lbl.grid(row = row_count, column = 2)
+        self.create_package_labels()
 
         # ordering frame
         self.calculated_cost = 0
@@ -118,67 +103,133 @@ class CateringGUI:
         '''
 
         self.calculate_btn = Button(self.place_order_frame, text = "Calculate Order Cost", command = self.calculate_cost) # make an error pop-up for every invalid input
-        self.calculate_btn.grid(row = 7, column = 0, columnspan=4)
+        self.calculate_btn.grid(row = 6, column = 0, columnspan=4)
 
 
         # check orders frame
-        self.check_order_frame = Frame(parent)
+        self.view_order_frame = Frame(parent)
 
-        user_orders_lbl = Label(self.check_order_frame, text = "Order/s that you have made:")
+        user_orders_lbl = Label(self.view_order_frame, text = "Order/s that you have made:")
         user_orders_lbl.grid(row = 2, column = 0)
 
-        name_lbl = Label(self.check_order_frame, text = "First Name:")
+        name_lbl = Label(self.view_order_frame, text = "First Name:")
         name_lbl.grid(row = 3, column = 0)
         
-        number_ppl_lbl = Label(self.check_order_frame, text = "Number of People:")
+        number_ppl_lbl = Label(self.view_order_frame, text = "Number of People:")
         number_ppl_lbl.grid(row = 3, column = 2)
 
-        self.user_name_lbl = Label(self.check_order_frame, text = "No data entered yet")
+        self.user_name_lbl = Label(self.view_order_frame, text = "No data entered yet")
         self.user_name_lbl.grid(row = 4, column = 0)
         
-        self.user_ppl_lbl = Label(self.check_order_frame, text = "No data entered yet")
+        self.user_ppl_lbl = Label(self.view_order_frame, text = "No data entered yet")
         self.user_ppl_lbl.grid(row = 4, column = 2)
 
-        package_lbl = Label(self.check_order_frame, text = "Cater Package:")
+        package_lbl = Label(self.view_order_frame, text = "Cater Package:")
         package_lbl.grid(row = 5, column = 0)
 
-        pax_lbl = Label(self.check_order_frame, text = "Order Cost:")
+        pax_lbl = Label(self.view_order_frame, text = "Order Cost:")
         pax_lbl.grid(row = 5, column = 2)
 
-        self.user_package_lbl = Label(self.check_order_frame, text = "No data entered yet")
+        self.user_package_lbl = Label(self.view_order_frame, text = "No data entered yet")
         self.user_package_lbl.grid(row = 6, column = 0)
         
-        self.user_cost_lbl = Label(self.check_order_frame, text = "No data entered yet")
+        self.user_cost_lbl = Label(self.view_order_frame, text = "No data entered yet")
         self.user_cost_lbl.grid(row = 6, column = 2)
 
-        self.prev_btn = Button(self.check_order_frame, text = "Previous", command = lambda: self.switch_orders(-1))
+        self.prev_btn = Button(self.view_order_frame, text = "Previous", command = lambda: self.switch_orders(-1))
         self.prev_btn.grid(row = 7, column = 0)
 
-        self.next_btn = Button(self.check_order_frame, text = "Next", command = lambda: self.switch_orders(1))
+        self.edit_btn = Button(self.view_order_frame, text = "Modify Order", command = lambda: self.switch_to_modify("modify"))
+        self.edit_btn.grid(row = 7, column = 1)
+
+        self.next_btn = Button(self.view_order_frame, text = "Next", command = lambda: self.switch_orders(1))
         self.next_btn.grid(row = 7, column = 2)
 
+        # modify frame
+
+        self.modify_order_frame  = Frame(parent)
+
+        name_lbl = Label(self.modify_order_frame, text = "First Name:")
+        name_lbl.grid(row = 2, column = 0)
+
+        number_ppl_lbl = Label(self.modify_order_frame, text = "How many people?")
+        number_ppl_lbl.grid(row = 2, column = 2)
+
+        self.modify_name_entry = Entry(self.modify_order_frame)
+        self.modify_name_entry.grid(row = 3, column = 0)
+
+        self.modify_pax_entry = Entry(self.modify_order_frame)
+        self.modify_pax_entry.grid(row = 3, column = 2)
+
+        package_lbl = Label(self.modify_order_frame, text = "Cater Package:")
+        package_lbl.grid(row = 4, column = 0)
+
+        pax_lbl = Label(self.modify_order_frame, text = "Pax Cost:")
+        pax_lbl.grid(row = 4, column = 2)
+
+        self.modify_package = OptionMenu(self.modify_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = self.update_pax) # list comprehension
+        self.modify_package.grid(row = 5, column = 0)
+
+        self.modify_pax_cost_lbl = Label(self.modify_order_frame, text = f"${self.selected_package.pax_cost:.2f}") 
+        self.modify_pax_cost_lbl.grid(row = 5, column = 2)
+
+        self.modify_order_btn = Button(self.modify_order_frame, text = "Modify Order")
+        self.modify_order_btn.grid(row = 6, column = 0)
+
+        self.return_back_btn = Button(self.modify_order_frame, text = "Return Back")
+        self.return_back_btn.grid(row = 6, column = 1)
+
+        self.cancel_order_btn = Button(self.modify_order_frame, text = "Cancel Order")
+        self.cancel_order_btn.grid(row = 6, column = 2)
+
+    def switch_to_modify(self, option):
+        if option == "modify":
+            self.view_order_frame.grid_forget()
+            self.navigation_menu.grid_forget()
+            self.editing_order_lbl.grid(row = 0, column = 3)
+            self.modify_order_frame.grid(row = 1, column = 0, columnspan = 4)
+        else:
+            # forget the modify frame and return back to view order frame
+            pass
 
 
     def switch_frames(self, selected_option):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
         if selected_option == "Home":
             self.place_order_frame.grid_forget()
-            self.check_order_frame.grid_forget()
+            self.view_order_frame.grid_forget()
             self.home_frame.grid(row = 1, column = 0, columnspan = 4)
 
         elif selected_option == "Place Order":
             self.home_frame.grid_forget()
-            self.check_order_frame.grid_forget()
-            self.clear_entries()
+            self.view_order_frame.grid_forget()
+            self.reset_order_frame()
             self.place_order_frame.grid(row = 1, column = 0, columnspan = 4)
 
         else:
             self.home_frame.grid_forget()
             self.place_order_frame.grid_forget()                                        # update check order labels with user
             self.check_orders()            
-            self.check_order_frame.grid(row = 1, column = 0, columnspan = 4)
+            self.view_order_frame.grid(row = 1, column = 0, columnspan = 4)
         
-    
+    def reset_order_frame(self):
+        default_package = self.catering_packages[0]
+        self.cater_packages_val.set(default_package.name)
+        self.pax_cost_lbl.configure(text = f'${default_package.pax_cost:.2f}')
+        self.clear_entries()
+
+    def create_package_labels(self):
+        row_count = 4                                       
+        for package in self.catering_packages:              
+            row_count += 1
+            package_name_lbl = Label(self.home_frame, text = f'{package.name}')      
+            package_menu_lbl = Label(self.home_frame, text = f'{package.menu}')
+            package_cost_lbl = Label(self.home_frame, text = f'${package.pax_cost:.2f}')
+            package_name_lbl.grid(row = row_count, column = 0)                                                   
+            package_menu_lbl.grid(row = row_count, column = 1)
+            package_cost_lbl.grid(row = row_count, column = 2)
+
+
     def calculate_cost(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
         user_name = self.get_name_entry()
@@ -190,7 +241,9 @@ class CateringGUI:
                 self.user_order_cost = self.catering_packages[self.package_index].calculate_cost(user_pax)
                 submit = messagebox.askyesno("Submit order?", f"Your final cost for this order is ${self.user_order_cost:.2f}\nDo you want to submit this order?")
                 if submit:
+                    messagebox.showinfo("Order added!", "Your order has been submitted!")
                     self.user_orders.append(Order(user_name, user_pax, user_package, self.user_order_cost))
+                    self.clear_entries()
                 else:
                     clear = messagebox.askyesno("Clear entries?", "Do you want to clear your entries?")
                     if clear:
@@ -207,6 +260,7 @@ class CateringGUI:
 
     def get_name_entry(self):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
+        check_name_error = False
         name = self.name_entry.get().strip()
         if name == "":
             messagebox.showerror("Invalid name input", "Please enter a valid name!")
@@ -228,6 +282,7 @@ class CateringGUI:
     
         else:    
             self.prev_btn.configure(state = DISABLED)
+            self.edit_btn.configure(state = DISABLED)
             self.next_btn.configure(state = DISABLED)
     
     def check_order_index(self):
@@ -235,10 +290,12 @@ class CateringGUI:
 
         if self.order_index == 0 and len(self.user_orders) == 1:
             self.prev_btn.configure(state = DISABLED)
+            self.edit_btn.configure(state = NORMAL)
             self.next_btn.configure(state = DISABLED)
         
         elif self.order_index == 0:
             self.prev_btn.configure(state = DISABLED)
+            self.edit_btn.configure(state = NORMAL)
             self.next_btn.configure(state = NORMAL)
 
         elif self.order_index == max_index:
