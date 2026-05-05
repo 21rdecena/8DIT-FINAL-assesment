@@ -134,7 +134,7 @@ class CateringGUI:
         self.modify_package = OptionMenu(self.modify_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = lambda choice: self.update_pax(choice, "modify")) # list comprehension
         self.modify_pax_cost_lbl = Label(self.modify_order_frame, text = f"${self.selected_package.pax_cost:.2f}") 
         self.modify_order_btn = Button(self.modify_order_frame, text = "Modify Order", command = self.modify_order)
-        self.return_back_btn = Button(self.modify_order_frame, text = "Return Back", command = lambda: self.switch_frames("Return to Frame"))
+        self.return_back_btn = Button(self.modify_order_frame, text = "Return Back", command = lambda: self.switch_frames("Return from Modify"))
         self.cancel_order_btn = Button(self.modify_order_frame, text = "Cancel Order", command = self.cancel_order)
 
 
@@ -176,7 +176,16 @@ class CateringGUI:
             self.editing_order_lbl.grid(row = 0, column = 3, padx = 62, pady = 15)
             self.modify_order_frame.grid(row = 1, column = 0, columnspan = 4)
 
-        elif selected_option == "Return to Frame":
+        elif selected_option == "Return from Modify":
+            self.editing_order_lbl.grid_forget()
+            self.modify_order_frame.grid_forget()
+            self.clear_entries("modify")
+            self.update_order_labels("view")
+            self.navigation_menu.grid(row = 0, column = 3, padx = 62, pady = 15)
+            self.view_order_frame.grid(row = 1, column = 0, columnspan = 4)
+            
+
+        elif selected_option == "Cancelled Order":
             self.editing_order_lbl.grid_forget()
             self.modify_order_frame.grid_forget()
             self.clear_entries("modify")
@@ -216,7 +225,7 @@ class CateringGUI:
                         current_selected_order.pax = new_pax
                         current_selected_order.cater_package = new_cater_package
                         current_selected_order.cost = new_order_cost
-                        self.switch_frames("Return to Frame")
+                        self.switch_frames("Return from Modify")
                     else:
                         messagebox.showinfo("Action cancelled", "Order was not modified.")
                 elif new_pax <= 0:
@@ -239,7 +248,7 @@ class CateringGUI:
             if second_ensure:
                 del self.user_orders[self.order_index]
                 self.order_index = 0
-                self.switch_frames("Return to Frame")
+                self.switch_frames("Cancelled Order")
             else:
                 messagebox.showinfo("Action cancelled", "You cancelled your action.")
         else:
@@ -284,8 +293,8 @@ class CateringGUI:
             
     def get_name_entry(self, frame):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
-        name = self.name_entry.get().strip()
-        modify_name = self.modify_name_entry.get().strip()
+        name = self.name_entry.get().title().strip()
+        modify_name = self.modify_name_entry.get().title().strip()
         if frame == "place":
             if name == "":
                 messagebox.showerror("Invalid name input", "Cannot be blank! Please enter a valid name.")
