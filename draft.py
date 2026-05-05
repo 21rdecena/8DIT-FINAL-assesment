@@ -76,7 +76,7 @@ class CateringGUI:
         self.number_ppl_entry = Entry(self.place_order_frame)
         package_lbl = Label(self.place_order_frame, text = "Cater Package:")
         pax_lbl = Label(self.place_order_frame, text = "Pax Cost:")
-        self.package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = lambda: self.update_pax("place")) # list comprehension                  
+        self.package_opt_menu = OptionMenu(self.place_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = lambda choice: self.update_pax(choice, "place")) # list comprehension                  
         self.pax_cost_lbl = Label(self.place_order_frame, text = f"${self.selected_package.pax_cost:.2f}") 
         self.calculate_btn = Button(self.place_order_frame, text = "Calculate Order Cost", command = self.calculate_cost) # make an error pop-up for every invalid input
 
@@ -131,7 +131,7 @@ class CateringGUI:
         self.modify_pax_entry = Entry(self.modify_order_frame)
         package_lbl = Label(self.modify_order_frame, text = "Cater Package:")
         pax_lbl = Label(self.modify_order_frame, text = "Pax Cost:")
-        self.modify_package = OptionMenu(self.modify_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = lambda: self.update_pax("modify")) # list comprehension
+        self.modify_package = OptionMenu(self.modify_order_frame, self.cater_packages_val, *[package.name for package in self.catering_packages], command = lambda choice: self.update_pax(choice, "modify")) # list comprehension
         self.modify_pax_cost_lbl = Label(self.modify_order_frame, text = f"${self.selected_package.pax_cost:.2f}") 
         self.modify_order_btn = Button(self.modify_order_frame, text = "Modify Order", command = self.modify_order)
         self.return_back_btn = Button(self.modify_order_frame, text = "Return Back", command = lambda: self.switch_frames("Return to Frame"))
@@ -152,11 +152,6 @@ class CateringGUI:
 
 
 
-
-
-
-
-
     def cancel_order(self):
         ensure = messagebox.askyesno("Cancelling Order", "WARNING! This will delete your order\nAre you sure?", icon = 'warning')
         if ensure:
@@ -170,9 +165,6 @@ class CateringGUI:
         else:
             messagebox.showinfo("Action cancelled", "You cancelled your action.")
     
-    def clear_modify_entries(self):
-        self.modify_name_entry.delete(0, END)
-        self.modify_pax_entry.delete(0, END)
 
     def modify_order(self):
         new_name = self.modify_name_entry.get().strip()
@@ -217,14 +209,14 @@ class CateringGUI:
         elif selected_option == "Modify Order":
             self.view_order_frame.grid_forget()
             self.navigation_menu.grid_forget()
-            self.update_modify_labels()
+            self.update_order_labels("modify")
             self.editing_order_lbl.grid(row = 0, column = 3)
             self.modify_order_frame.grid(row = 1, column = 0, columnspan = 4)
 
         elif selected_option == "Return to Frame":
             self.editing_order_lbl.grid_forget()
             self.modify_order_frame.grid_forget()
-            self.clear_modify_entries()
+            self.clear_entries("modify")
             self.navigation_menu.grid(row = 0, column = 3)
             self.view_order_frame.grid(row = 1, column = 0, columnspan = 4)
             self.reset_frame("view")
@@ -258,7 +250,7 @@ class CateringGUI:
             default_package = self.catering_packages[0]
             self.cater_packages_val.set(default_package.name)
             self.pax_cost_lbl.configure(text = f'${default_package.pax_cost:.2f}')
-            self.clear_entries()
+            self.clear_entries("place")
 
  
     def create_package_labels(self):
@@ -286,25 +278,25 @@ class CateringGUI:
                 if submit:
                     messagebox.showinfo("Order added!", "Your order has been submitted!")
                     self.user_orders.append(Order(user_name, user_pax, user_package, user_order_cost))
-                    self.clear_entries()
+                    self.clear_entries("place")
                 else:
                     clear = messagebox.askyesno("Clear entries?", "Do you want to clear your entries?")
                     if clear:
-                        self.clear_entries()
+                        self.clear_entries("place")
                     else:
                         self.name_entry.focus()
             elif user_pax <= 0:
                 messagebox.showerror("Number cannot be zero or less than zero", "Please enter an integer greater than 8!")
-                self.clear_entries()
+                self.clear_entries("place")
             elif 0 < user_pax < 8:
                 messagebox.showerror("Number cannot be negative", "Please enter an integer greater than 8!")
-                self.clear_entries()
+                self.clear_entries("place")
             else:
                 messagebox.showerror("Number cannot be greater than 100", "Please enter an integer less than 100!")
-                self.clear_entries()
+                self.clear_entries("place")
         except ValueError:
             messagebox.showerror("Invalid input", "Please enter a valid integer!")
-            self.clear_entries()
+            self.clear_entries("place")
         
 
     def get_name_entry(self):
@@ -313,17 +305,18 @@ class CateringGUI:
         name = self.name_entry.get().strip()
         if name == "":
             messagebox.showerror("Invalid name input", "Please enter a valid name!")
-            self.clear_entries()                                                        # maybe check for the length of the name and 
+            self.clear_entries("place")                                                        # maybe check for the length of the name and 
         else:
             return name
 
     def update_pax(self, choice, frame):
+        """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
         count = 0
         if frame == "place":
             for package in self.catering_packages:
                 if choice == package.name:
                     self.pax_cost_lbl.configure(text = f'${package.pax_cost:.2f}')
-                    self.clear_entries()
+                    self.clear_entries("place")
                     self.package_index = count
                     self.selected_package = package
                 else:
@@ -337,11 +330,9 @@ class CateringGUI:
                 else:
                     count += 1
 
-
-
     def check_orders(self):
         if len(self.user_orders) != 0: 
-            self.update_orders()
+            self.update_order_labels("view")
             self.check_order_index()
     
         else:    
@@ -368,35 +359,35 @@ class CateringGUI:
         
         else:
             self.prev_btn.configure(state = NORMAL)
-            self.next_btn.configure(state = NORMAL)
-            
-    def update_modify_labels(self):                               # merge this with the update orders function later PLEASE
+            self.next_btn.configure(state = NORMAL) 
+
+    def update_order_labels(self, frame):
         self.selected_order = self.user_orders[self.order_index]
-
-        self.modify_name_entry.insert(0, f'{self.selected_order.name}')
-        self.modify_pax_entry.insert(0, f'{self.selected_order.pax}')
-        self.cater_packages_val.set(self.catering_packages[0].name)
-       
-
-    def update_orders(self):
-        self.selected_order = self.user_orders[self.order_index]
-
-        self.user_name_lbl.configure(text = f"{self.selected_order.name}")
-        self.user_pax_lbl.configure(text = f"{self.selected_order.pax} pax")
-        self.user_package_lbl.configure(text = f"{self.selected_order.cater_package}")
-        self.user_cost_lbl.configure(text = f"${self.selected_order.cost:.2f}")
+        
+        if frame ==  "view":
+            self.user_name_lbl.configure(text = f"{self.selected_order.name}")
+            self.user_pax_lbl.configure(text = f"{self.selected_order.pax} pax")
+            self.user_package_lbl.configure(text = f"{self.selected_order.cater_package}")
+            self.user_cost_lbl.configure(text = f"${self.selected_order.cost:.2f}")
+        else:
+            self.modify_name_entry.insert(0, f'{self.selected_order.name}')
+            self.modify_pax_entry.insert(0, f'{self.selected_order.pax}')
+            self.cater_packages_val.set(self.catering_packages[0].name)
 
     def switch_orders(self, amount):
         self.order_index += amount
         self.check_order_index()
-        self.update_orders()
-    
+        self.update_order_labels("view")
 
-    def clear_entries(self):
+    def clear_entries(self, frame):
         """ Placeholder docstring describing the method (REPLACE THIS!!!!!)"""
-        self.name_entry.delete(0, END)
-        self.number_ppl_entry.delete(0, END)
-        self.name_entry.focus()
+        if frame == "place":
+            self.name_entry.delete(0, END)
+            self.number_ppl_entry.delete(0, END)
+            self.name_entry.focus()
+        else:
+            self.modify_name_entry.delete(0, END)
+            self.modify_pax_entry.delete(0, END)
 
 if __name__ == "__main__":
     root = Tk()
